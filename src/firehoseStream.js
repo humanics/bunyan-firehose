@@ -29,9 +29,9 @@ class FirehoseStream extends Writable {
     this.hasPriority = this.buffer.isPrioritaryMsg || this.buffer.hasPriority;
 
     // increase the timeout to get credentials from the EC2 Metadata Service
-    AWS.config.credentials = new AWS.EC2MetadataCredentials({
-      httpOptions: httpOptions || { timeout: 5000 }
-    });
+//     AWS.config.credentials = new AWS.EC2MetadataCredentials({
+//       httpOptions: httpOptions || { timeout: 5000 }
+//     });
 
     this.recordsQueue = [];
 
@@ -123,6 +123,9 @@ class FirehoseStream extends Writable {
 
     // remove all listeners which end up leaking
     req.on('complete', function () {
+      if (req.error) {
+        throw new Error(req.error.message);
+      } 
       req.removeAllListeners();
       req.response.httpResponse.stream.removeAllListeners();
       req.httpRequest.stream.removeAllListeners();
